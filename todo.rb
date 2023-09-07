@@ -49,7 +49,8 @@ post '/lists' do
 end
 
 get '/lists/:list_id' do |list_id|
-end
-
-get '/lists/:list_id/todos/todo_id' do |list_id, todo_id|
+  @list_id = list_id.to_i
+  @list = session[:lists][@list_id]
+  @list[:todos] = ["eat nachos", "pet dog", "punch a kangaroo"]
+  erb :list
 end
