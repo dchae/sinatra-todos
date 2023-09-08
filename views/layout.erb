@@ -11,6 +11,7 @@
     <header>
       <h1>Todo Tracker</h1>
     </header>
+<%# need to create a session[:messages] array and iterate through all flash msgs %>
     <% if session[:success] %>
       <div class="flash success">
         <p><%= session.delete(:success) %></p>

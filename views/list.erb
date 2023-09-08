@@ -3,6 +3,8 @@
     <h2><%= @list.name %></h2>
   </header>
   <ul>
+<%# This could probably be more efficient %>
+<%# Need to add flash messages for completion, updating, and deletion of todos %>
     <% @list.each_with_index do |todo, todo_id| %>
       <%next if todo.done?%>
       <li>
