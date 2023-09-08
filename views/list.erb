@@ -1,11 +1,32 @@
 <section id="todos" class>
   <header>
-    <h2><%= @list[:name] %></h2>
+    <h2><%= @list.name %></h2>
   </header>
   <ul>
-    <% @list[:todos].each do |todo| %>
+    <% @list.each_with_index do |todo, todo_id| %>
+      <%next if todo.done?%>
       <li>
+        <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>" method="post" class="check">
+          <input type="hidden" name="completed" value="<%=(!todo.done?).to_s%>">
+          <button type="submit">Complete</button>
+        </form>
         <h3><%= todo %></h3>
+        <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>/destroy" method="post" class="delete">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% end %>
+    <% @list.each_with_index do |todo, todo_id| %>
+      <% next unless todo.done? %>
+      <li class="complete">
+        <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>" method="post" class="check">
+          <input type="hidden" name="completed" value="<%=(!todo.done?).to_s%>">
+          <button type="submit">Complete</button>
+        </form>
+        <h3><%= todo %></h3>
+        <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>/destroy" method="post" class="delete">
+          <button type="submit">Delete</button>
+        </form>
       </li>
     <% end %>
   </ul>

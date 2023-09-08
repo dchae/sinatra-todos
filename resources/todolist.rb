@@ -3,13 +3,10 @@
 # flag to show whether this todo item is done.
 
 class Todo
-  DONE_MARKER = "X"
-  UNDONE_MARKER = " "
+  attr_accessor :name, :description, :done
 
-  attr_accessor :title, :description, :done
-
-  def initialize(title, description = "")
-    @title = title
+  def initialize(name, description = '')
+    @name = name
     @description = description
     @done = false
   end
@@ -27,11 +24,11 @@ class Todo
   end
 
   def to_s
-    "[#{done? ? DONE_MARKER : UNDONE_MARKER}] #{title}"
+    name
   end
 
   def ==(otherTodo)
-    title == otherTodo.title && description == otherTodo.description &&
+    name == otherTodo.title && description == otherTodo.description &&
       done == otherTodo.done
   end
 end
@@ -41,15 +38,15 @@ end
 # on a TodoList object, including iteration and selection.
 
 class TodoList
-  attr_accessor :title
+  attr_accessor :name
 
-  def initialize(title)
-    @title = title
+  def initialize(name)
+    @name = name
     @todos = []
   end
 
   def <<(todo)
-    raise TypeError.new("Can only add Todo objects") unless todo.is_a?(Todo)
+    raise TypeError.new('Can only add Todo objects') unless todo.is_a?(Todo)
     todos << todo
   end
 
@@ -106,8 +103,9 @@ class TodoList
   end
 
   def to_s
-    str = "-" * 4 + title + "-" * 4 + "\n"
-    str << todos.map(&:to_s).join("\n")
+    # str = '-' * 4 + name + '-' * 4 + "\n"
+    # str << todos.map(&:to_s).join("\n")
+    name + ": " + todos.map(&:to_s).join(", ")
   end
 
   def each
@@ -115,17 +113,22 @@ class TodoList
     self
   end
 
+  def each_with_index
+    todos.each_with_index { |todo, i| yield(todo, i) }
+    self
+  end
+
   def select
     # res = []
     # todos.each { |todo| res << todo if yield(todo) }
 
-    res = TodoList.new(title)
+    res = TodoList.new(name)
     self.each { |todo| res.add(todo) if yield(todo) }
     res
   end
 
-  def find_by_title(title)
-    self.each { |todo| return todo if todo.title == title }
+  def find_by_name(name)
+    self.each { |todo| return todo if todo.name == name }
     nil
   end
 
@@ -137,8 +140,8 @@ class TodoList
     self.select { |todo| !todo.done }
   end
 
-  def mark_done(title)
-    todo = self.find_by_title(title)
+  def mark_done(name)
+    todo = self.find_by_name(name)
     todo.done! if todo
     self
   end

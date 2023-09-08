@@ -1,9 +1,9 @@
 <ul id="lists">
-  <% @lists.each_with_index do |list, i| %>
+  <% @lists.each_with_index do |todolist, i| %>
     <li>
       <a>
-        <h2><a href="/lists/<%= i %>"><%= list[:name]%></a></h2>
-        <p><%= list[:todos].size%></p>
+        <h2><a href="/lists/<%= i %>"><%= todolist.name%></a></h2>
+        <p><%= todolist.size%></p>
       </a>
     </li>
   <% end %>
