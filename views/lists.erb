@@ -3,9 +3,8 @@
     <li>
       <a>
         <h2><a href="/lists/<%= i %>"><%= todolist.name%></a></h2>
-        <p><%= todolist.size%></p>
+        <p><%=todolist.all_done.size%> / <%= todolist.size%></p>
       </a>
     </li>
   <% end %>
 </ul>
-<a href="/lists/new">New List</a>

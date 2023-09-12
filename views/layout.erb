@@ -10,18 +10,19 @@
   <body>
     <header>
       <h1>Todo Tracker</h1>
+      <div class="actions">
+        <a class="<%=@button%>" href="<%=@button_link%>">
+          <%=@button_text%>
+        </a>
+      </div>
     </header>
 <%# need to create a session[:messages] array and iterate through all flash msgs %>
-    <% if session[:success] %>
-      <div class="flash success">
-        <p><%= session.delete(:success) %></p>
+    <% session[:messages].each do |message| %>
+      <div class="flash <%=message.type%>">
+        <p><%= message.text %></p>
       </div>
     <% end %>
-    <% if session[:error] %>
-      <div class="flash error">
-        <p><%= session.delete(:error) %></p>
-      </div>
-    <% end %>
+    <%session[:messages].clear%>
     <main>
       <%= yield %>
     </main>

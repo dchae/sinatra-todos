@@ -1,10 +1,18 @@
 <section id="todos" class>
   <header>
     <h2><%= @list.name %></h2>
+    <ul>
+      <li>
+        <form action="/lists/<%=@list_id%>/complete_all" method="post">
+          <button class="check" type="submit">Complete All</button>
+        </form>
+      </li>
+      <li><a class="edit" href="/lists/<%=@list_id%>/edit">Edit List</a></li>
+    </ul>
   </header>
   <ul>
-<%# This could probably be more efficient %>
-<%# Need to add flash messages for completion, updating, and deletion of todos %>
+    <%# This could probably be more efficient %>
+    <%# Need to add flash messages for completion, updating, and deletion of todos %>
     <% @list.each_with_index do |todo, todo_id| %>
       <%next if todo.done?%>
       <li>
