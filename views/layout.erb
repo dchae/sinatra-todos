@@ -11,12 +11,10 @@
     <header>
       <h1>Todo Tracker</h1>
       <div class="actions">
-        <a class="<%=@button%>" href="<%=@button_link%>">
-          <%=@button_text%>
-        </a>
+        <%= yield_content :header_links %>
       </div>
     </header>
-<%# need to create a session[:messages] array and iterate through all flash msgs %>
+    <%# need to create a session[:messages] array and iterate through all flash msgs %>
     <% session[:messages].each do |message| %>
       <div class="flash <%=message.type%>">
         <p><%= message.text %></p>

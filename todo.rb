@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'sinatra/reloader'
+require "sinatra/content_for"
 require 'tilt/erubis'
 
 require_relative './resources/todolist.rb'
@@ -21,9 +22,6 @@ end
 
 # Display list of todo lists
 get '/lists' do
-  @button = 'add'
-  @button_link = '/lists/new'
-  @button_text = 'New List'
   @lists = session[:lists]
   erb :lists, layout: :layout
 end
@@ -58,16 +56,10 @@ post '/lists' do
 end
 
 get '/lists/:list_id' do |list_id|
-  @button = 'list'
-  @button_link = '/lists'
-  @button_text = 'All Lists'
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
 
-  # ['eat nachos', 'pet dog', 'punch a kangaroo'].each do |item|
-  #   @list << Todo.new(item) if @list.size < 3
-  # end
-  erb :list
+  erb :list, layout: :layout
 end
 
 post '/lists/:list_id' do |list_id|
