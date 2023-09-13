@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'sinatra/reloader'
-require "sinatra/content_for"
+require 'sinatra/content_for'
 require 'tilt/erubis'
 
 require_relative './resources/todolist.rb'
@@ -16,6 +16,7 @@ before do
   session[:messages] ||= []
 end
 
+# Homepage redirection
 get '/' do
   redirect '/lists'
 end
@@ -27,7 +28,7 @@ get '/lists' do
 end
 set :session_secret, SecureRandom.hex(32)
 
-# Render new todo list form
+# Display form for new todo list creation
 get '/lists/new' do
   erb :new_list, layout: :layout
 end
@@ -43,8 +44,8 @@ end
 # Create a new todo list
 post '/lists' do
   list_name = params[:list_name].strip
-  error = error_for_list_name(list_name)
 
+  error = error_for_list_name(list_name)
   if error
     session[:messages] << error
     erb :new_list, layout: :layout
@@ -55,6 +56,7 @@ post '/lists' do
   end
 end
 
+# Display a todo list
 get '/lists/:list_id' do |list_id|
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
@@ -62,18 +64,27 @@ get '/lists/:list_id' do |list_id|
   erb :list, layout: :layout
 end
 
+# Edit an existing todo list
+get '/lists/:list_id/edit' do |list_id|
+  @list_id = list_id.to_i
+  @list = session[:lists][@list_id]
+
+  erb :edit_list
+end
+
+# Update an existing todo list
 post '/lists/:list_id' do |list_id|
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
   new_list_name = params[:list_name].strip
-  error = error_for_list_name(new_list_name)
 
+  error = error_for_list_name(new_list_name)
   if error
     session[:messages] << error
     erb :edit_list, layout: :layout
   else
     @list.name = new_list_name
-    session[:messages] << SuccessMessage.new('The list has been created.')
+    session[:messages] << SuccessMessage.new('The list has been updated.')
     redirect "/lists/#{@list_id}"
   end
 end
@@ -84,6 +95,7 @@ def error_for_todo_name(todo_name)
   end
 end
 
+# Add a new todo item to the list
 post '/lists/:list_id/todos' do |list_id|
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
@@ -100,6 +112,7 @@ post '/lists/:list_id/todos' do |list_id|
   end
 end
 
+# Mark a todo done or undone
 post '/lists/:list_id/todos/:todo_id' do |list_id, todo_id|
   @list_id, @todo_id = [list_id, todo_id].map(&:to_i)
   @list = session[:lists][@list_id]
@@ -109,6 +122,7 @@ post '/lists/:list_id/todos/:todo_id' do |list_id, todo_id|
   redirect "/lists/#{@list_id}"
 end
 
+# Delete a todo item
 post '/lists/:list_id/todos/:todo_id/destroy' do |list_id, todo_id|
   @list_id, @todo_id = [list_id, todo_id].map(&:to_i)
   @list = session[:lists][@list_id]
@@ -117,6 +131,7 @@ post '/lists/:list_id/todos/:todo_id/destroy' do |list_id, todo_id|
   redirect "/lists/#{@list_id}"
 end
 
+# Mark all todos in a list as done
 post '/lists/:list_id/complete_all' do |list_id|
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
@@ -125,13 +140,7 @@ post '/lists/:list_id/complete_all' do |list_id|
   redirect "/lists/#{@list_id}"
 end
 
-get '/lists/:list_id/edit' do |list_id|
-  @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
-
-  erb :edit_list
-end
-
+# Delete a list
 post '/lists/:list_id/destroy' do |list_id|
   @list_id = list_id.to_i
   session[:lists].delete_at(@list_id)
