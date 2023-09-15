@@ -89,6 +89,15 @@ post '/lists/:list_id' do |list_id|
   end
 end
 
+# Delete a list
+post '/lists/:list_id/destroy' do |list_id|
+  @list_id = list_id.to_i
+  session[:lists].delete_at(@list_id)
+
+  session[:messages] << SuccessMessage.new('The list has been deleted.')
+  redirect '/lists'
+end
+
 def error_for_todo_name(todo_name)
   if !(1..100).include?(todo_name.size)
     ErrorMessage.new('Todo name must be between 1 and 100 characters.')
@@ -99,12 +108,12 @@ end
 post '/lists/:list_id/todos' do |list_id|
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
-  todo_name = params[:todo]
+  todo_name = params[:todo].strip
 
   error = error_for_todo_name(todo_name)
   if error
     session[:messages] << error
-    erb :new_list
+    erb :list, layout: :layout
   else
     @list << Todo.new(todo_name)
     session[:messages] << SuccessMessage.new('The todo has been added.')
@@ -138,15 +147,6 @@ post '/lists/:list_id/complete_all' do |list_id|
   @list.mark_all_done
   session[:messages] << SuccessMessage.new('All todos have been completed.')
   redirect "/lists/#{@list_id}"
-end
-
-# Delete a list
-post '/lists/:list_id/destroy' do |list_id|
-  @list_id = list_id.to_i
-  session[:lists].delete_at(@list_id)
-
-  session[:messages] << SuccessMessage.new('The list has been deleted.')
-  redirect '/lists'
 end
 
 not_found { redirect '/lists' }
