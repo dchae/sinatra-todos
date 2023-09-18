@@ -56,6 +56,10 @@ class TodoList
     todos.size
   end
 
+  def empty?
+    self.size == 0
+  end
+
   def first
     todos.first
   end
@@ -69,7 +73,7 @@ class TodoList
   end
 
   def done?
-    todos.all?(&:done?)
+    !self.empty? && todos.all?(&:done?)
   end
 
   def item_at(i)

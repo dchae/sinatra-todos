@@ -1,8 +1,18 @@
 <ul id="lists">
   <% @lists.each_with_index do |todolist, i| %>
+    <% next if todolist.done?%>
     <li>
       <a>
-        <h2><a href="/lists/<%= i %>"><%= todolist.name%></a></h2>
+        <h2><a href="/lists/<%= i %>" ><%= todolist.name%></a></h2>
+        <p><%=todolist.all_done.size%> / <%= todolist.size%></p>
+      </a>
+    </li>
+  <% end %>
+  <% @lists.each_with_index do |todolist, i| %>
+    <% next unless todolist.done?%>
+    <li class="<%=list_class(todolist)%>">
+      <a>
+        <h2><a href="/lists/<%= i %>" ><%= todolist.name%></a></h2>
         <p><%=todolist.all_done.size%> / <%= todolist.size%></p>
       </a>
     </li>
@@ -12,4 +22,4 @@
   <a class="add" href="/lists/new">
     New List
   </a>
-<% end%>
+<% end %>

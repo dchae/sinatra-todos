@@ -1,4 +1,4 @@
-<section id="todos" class>
+<section id="todos" class="<%=list_class(@list)%>">
   <header>
     <h2><%= @list.name %></h2>
     <ul>
@@ -17,7 +17,7 @@
       <%next if todo.done?%>
       <li>
         <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>" method="post" class="check">
-          <input type="hidden" name="completed" value="<%=(!todo.done?).to_s%>">
+          <input type="hidden" name="completed" value="true">
           <button type="submit">Complete</button>
         </form>
         <h3><%= todo %></h3>
@@ -30,7 +30,7 @@
       <% next unless todo.done? %>
       <li class="complete">
         <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>" method="post" class="check">
-          <input type="hidden" name="completed" value="<%=(!todo.done?).to_s%>">
+          <input type="hidden" name="completed" value="false">
           <button type="submit">Complete</button>
         </form>
         <h3><%= todo %></h3>
