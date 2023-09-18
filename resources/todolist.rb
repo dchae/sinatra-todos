@@ -118,8 +118,12 @@ class TodoList
   end
 
   def each_with_index
-    todos.each_with_index { |todo, i| yield(todo, i) }
-    self
+    if block_given?
+      todos.each_with_index { |todo, i| yield(todo, i) }
+      self
+    else
+      todos.each_with_index
+    end
   end
 
   def select

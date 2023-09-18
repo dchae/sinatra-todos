@@ -1,4 +1,4 @@
-<section id="todos" class="<%=list_class(@list)%>">
+<section id="todos" class="<%=css_class(@list)%>">
   <header>
     <h2><%= @list.name %></h2>
     <ul>
@@ -13,24 +13,10 @@
     </ul>
   </header>
   <ul>
-    <% @list.each_with_index do |todo, todo_id| %>
-      <%next if todo.done?%>
-      <li>
+    <% sort_by_done(@list).each do |todo, todo_id| %>
+      <li class="<%= css_class(todo) %>">
         <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>" method="post" class="check">
-          <input type="hidden" name="completed" value="true">
-          <button type="submit">Complete</button>
-        </form>
-        <h3><%= todo %></h3>
-        <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>/destroy" method="post" class="delete">
-          <button type="submit">Delete</button>
-        </form>
-      </li>
-    <% end %>
-    <% @list.each_with_index do |todo, todo_id| %>
-      <% next unless todo.done? %>
-      <li class="complete">
-        <form action="/lists/<%=@list_id%>/todos/<%=todo_id%>" method="post" class="check">
-          <input type="hidden" name="completed" value="false">
+          <input type="hidden" name="completed" value="<%= (!todo.done?).to_s %>">
           <button type="submit">Complete</button>
         </form>
         <h3><%= todo %></h3>

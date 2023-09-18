@@ -18,10 +18,14 @@ end
 
 # View helpers
 helpers do
-  def list_class(list)
-    if list.done?
+  def css_class(element)
+    if element.done?
       "complete"
     end
+  end
+
+  def sort_by_done(list)
+    (list.each_with_index.sort_by { |element, i| element.done? ? 1 : 0})
   end
 end
 
