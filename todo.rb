@@ -1,5 +1,5 @@
 require "sinatra"
-require "sinatra/reloader"
+require "sinatra/reloader" if development?
 require "sinatra/content_for"
 require "tilt/erubis"
 
@@ -25,7 +25,8 @@ helpers do
   end
 
   def sort_by_done(list)
-    (list.each_with_index.sort_by { |element, i| element.done? ? 1 : 0})
+    undone, done = list.each_with_index.partition { |element, i| !element.done? }
+    undone + done
   end
 end
 
