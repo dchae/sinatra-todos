@@ -6,6 +6,7 @@ require "tilt/erubis"
 require_relative "./resources/todolist.rb"
 require_relative "./resources/messages.rb"
 
+
 configure do
   enable :sessions
   set :session_secret, "secret"
@@ -18,6 +19,15 @@ end
 
 # View helpers
 helpers do
+  # escape html
+  def h(text)
+    Rack::Utils.escape_html(text)
+  end
+
+  def hattr(text)
+    Rack::Utils.escape_path(text)
+  end
+
   def css_class(element)
     if element.done?
       "complete"
@@ -57,7 +67,7 @@ end
 
 # Create a new todo list
 post "/lists" do
-  list_name = params[:list_name].strip
+  list_name = h(params[:list_name].strip)
 
   error = error_for_list_name(list_name)
   if error
@@ -90,7 +100,7 @@ end
 post "/lists/:list_id" do |list_id|
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
-  new_list_name = params[:list_name].strip
+  new_list_name = h(params[:list_name].strip)
 
   error = error_for_list_name(new_list_name)
   if error
@@ -122,7 +132,7 @@ end
 post "/lists/:list_id/todos" do |list_id|
   @list_id = list_id.to_i
   @list = session[:lists][@list_id]
-  todo_name = params[:todo].strip
+  todo_name = h(params[:todo].strip)
 
   error = error_for_todo_name(todo_name)
   if error
@@ -139,7 +149,7 @@ end
 post "/lists/:list_id/todos/:todo_id" do |list_id, todo_id|
   @list_id, @todo_id = [list_id, todo_id].map(&:to_i)
   @list = session[:lists][@list_id]
-  completed = (params[:completed] == "true")
+  completed = h(params[:completed]) == "true"
   completed ? @list.mark_done_at(@todo_id) : @list.mark_undone_at(@todo_id)
   session[:messages] << SuccessMessage.new("The todo has been updated.")
   redirect "/lists/#{@list_id}"
