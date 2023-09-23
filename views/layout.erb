@@ -11,7 +11,7 @@
     <header>
       <h1>Todo Tracker</h1>
       <div class="actions">
-        <%= yield_content :header_links %>
+        <%== yield_content :header_links %>
       </div>
     </header>
     <%# need to create a session[:messages] array and iterate through all flash msgs %>
@@ -22,7 +22,7 @@
     <% end %>
     <%session[:messages].clear%>
     <main>
-      <%= yield %>
+      <%== yield %>
     </main>
   </body>
 </html>
