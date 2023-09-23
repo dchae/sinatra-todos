@@ -6,7 +6,6 @@ require "tilt/erubis"
 require_relative "./resources/todolist.rb"
 require_relative "./resources/messages.rb"
 
-
 configure do
   enable :sessions
   set :session_secret, "secret"
@@ -39,6 +38,14 @@ helpers do
     undone, done = list.each_with_index.partition { |element, i| !element.done? }
     undone + done
   end
+end
+
+def get_list(list_id)
+  list = session[:lists][list_id]
+  return list if list
+
+  session[:messages] << ErrorMessage.new("List does not exist.")
+  redirect "/lists"
 end
 
 # Homepage redirection
@@ -84,7 +91,7 @@ end
 # Display a todo list
 get "/lists/:list_id" do |list_id|
   @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
+  @list = get_list(@list_id)
 
   erb :list, layout: :layout
 end
@@ -92,7 +99,7 @@ end
 # Edit an existing todo list
 get "/lists/:list_id/edit" do |list_id|
   @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
+  @list = get_list(@list_id)
 
   erb :edit_list
 end
@@ -100,7 +107,7 @@ end
 # Update an existing todo list
 post "/lists/:list_id" do |list_id|
   @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
+  @list = get_list(@list_id)
   new_list_name = h(params[:list_name].strip)
 
   error = error_for_list_name(new_list_name)
@@ -132,7 +139,7 @@ end
 # Add a new todo item to the list
 post "/lists/:list_id/todos" do |list_id|
   @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
+  @list = get_list(@list_id)
   todo_name = h(params[:todo].strip)
 
   error = error_for_todo_name(todo_name)
@@ -149,7 +156,7 @@ end
 # Mark a todo done or undone
 post "/lists/:list_id/todos/:todo_id" do |list_id, todo_id|
   @list_id, @todo_id = [list_id, todo_id].map(&:to_i)
-  @list = session[:lists][@list_id]
+  @list = get_list(@list_id)
   completed = h(params[:completed]) == "true"
   completed ? @list.mark_done_at(@todo_id) : @list.mark_undone_at(@todo_id)
   session[:messages] << SuccessMessage.new("The todo has been updated.")
@@ -159,7 +166,7 @@ end
 # Delete a todo item
 post "/lists/:list_id/todos/:todo_id/destroy" do |list_id, todo_id|
   @list_id, @todo_id = [list_id, todo_id].map(&:to_i)
-  @list = session[:lists][@list_id]
+  @list = get_list(@list_id)
   @list.remove_at(@todo_id)
   session[:messages] << SuccessMessage.new("The todo has been deleted.")
   redirect "/lists/#{@list_id}"
@@ -168,7 +175,7 @@ end
 # Mark all todos in a list as done
 post "/lists/:list_id/complete_all" do |list_id|
   @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
+  @list = get_list(@list_id)
   msg = if @list.empty?
       ErrorMessage.new("No todos in list.")
     else
