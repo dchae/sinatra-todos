@@ -125,9 +125,12 @@ end
 post "/lists/:list_id/destroy" do |list_id|
   @list_id = list_id.to_i
   session[:lists].delete_at(@list_id)
-
-  session[:messages] << SuccessMessage.new("The list has been deleted.")
-  redirect "/lists"
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    "/lists"
+  else
+    session[:messages] << SuccessMessage.new("The list has been deleted.")
+    redirect "/lists"
+  end
 end
 
 def error_for_todo_name(todo_name)
@@ -165,11 +168,15 @@ end
 
 # Delete a todo item
 post "/lists/:list_id/todos/:todo_id/destroy" do |list_id, todo_id|
-  @list_id, @todo_id = [list_id, todo_id].map(&:to_i)
+  @list_id, todo_id = [list_id, todo_id].map(&:to_i)
   @list = get_list(@list_id)
-  @list.remove_at(@todo_id)
-  session[:messages] << SuccessMessage.new("The todo has been deleted.")
-  redirect "/lists/#{@list_id}"
+  @list.remove_at(todo_id)
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    status 204 # Success - No Content
+  else
+    session[:messages] << SuccessMessage.new("The todo has been deleted.")
+    redirect "/lists/#{@list_id}"
+  end
 end
 
 # Mark all todos in a list as done
