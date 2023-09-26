@@ -3,10 +3,14 @@
 # flag to show whether this todo item is done.
 
 class Todo
+  @@cur_id = 0
   attr_accessor :name, :description, :done
+  attr_reader :id
 
-  def initialize(name, description = '')
+  def initialize(name, description = "")
     @name = name
+    @id = @@cur_id
+    @@cur_id += 1
     @description = description
     @done = false
   end
@@ -42,12 +46,12 @@ class TodoList
 
   def initialize(name)
     @name = name
-    @todos = []
+    @todos = {}
   end
 
   def <<(todo)
-    raise TypeError.new('Can only add Todo objects') unless todo.is_a?(Todo)
-    todos << todo
+    raise TypeError.new("Can only add Todo objects") unless todo.is_a?(Todo)
+    todos[todo.id] = todo
   end
 
   alias_method :add, :<<
@@ -69,15 +73,15 @@ class TodoList
   end
 
   def to_a
-    todos.dup
+    todos.values
   end
 
   def done?
-    !self.empty? && todos.all?(&:done?)
+    !self.empty? && todos.values.all?(&:done?)
   end
 
   def item_at(i)
-    raise IndexError if i >= todos.size
+    raise IndexError unless todos.key?(i)
     todos[i]
   end
 
@@ -90,7 +94,7 @@ class TodoList
   end
 
   def done!
-    todos.each(&:done!)
+    todos.each_todo(&:done!)
   end
 
   def shift
@@ -102,8 +106,8 @@ class TodoList
   end
 
   def remove_at(i)
-    raise IndexError if i >= todos.size
-    todos.delete_at(i)
+    raise IndexError unless todos.key?(i)
+    todos.delete(i)
   end
 
   def to_s
@@ -113,25 +117,38 @@ class TodoList
   end
 
   def each
-    todos.each { |todo| yield(todo) }
-    self
+    if block_given?
+      todos.each { |todo_id, todo| yield(todo_id, todo) }
+      self
+    else
+      todos.each
+    end
+  end
+
+  def each_todo
+    if block_given?
+      todos.each { |_, todo| yield(todo) }
+      todos.values
+    else
+      todos.values.each
+    end
   end
 
   def each_with_index
     if block_given?
-      todos.each_with_index { |todo, i| yield(todo, i) }
+      todos.values.each_with_index { |todo, i| yield(todo, i) }
       self
     else
-      todos.each_with_index
+      todos.values.each_with_index
     end
   end
 
   def select
-    # res = []
-    # todos.each { |todo| res << todo if yield(todo) }
+    res = []
+    self.each_todo { |todo| res << todo if yield(todo) }
 
-    res = TodoList.new(name)
-    self.each { |todo| res.add(todo) if yield(todo) }
+    # res = TodoList.new(name)
+    # self.each { |todo| res.add(todo) if yield(todo) }
     res
   end
 
@@ -141,25 +158,25 @@ class TodoList
   end
 
   def all_done
-    self.select(&:done)
+    self.select(&:done?)
   end
 
   def all_not_done
-    self.select { |todo| !todo.done }
+    self.select { |todo| !todo.done? }
   end
 
-  def mark_done(name)
-    todo = self.find_by_name(name)
-    todo.done! if todo
-    self
-  end
+  # def mark_done_by_name(name)
+  #   todo = self.find_by_name(name)
+  #   todo.done! if todo
+  #   self
+  # end
 
   def mark_all_done
-    self.each(&:done!)
+    self.each_todo(&:done!)
   end
 
   def mark_all_undone
-    self.each(&:undone!)
+    self.each_todo(&:undone!)
   end
 
   protected
