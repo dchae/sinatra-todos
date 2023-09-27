@@ -1,8 +1,8 @@
 <ul id="lists">
-  <% sort_by_done(@lists).each do |list, i| %>
+  <% sort_by_done(@lists.values).each do |list| %>
     <li class="<%= css_class(list) %>">
       <a>
-        <h2><a href="/lists/<%= i %>" ><%= list.name %></a></h2>
+        <h2><a href="/lists/<%= list.id %>" ><%= list.name %></a></h2>
         <p><%= list.all_done.size %> / <%= list.size %></p>
       </a>
     </li>

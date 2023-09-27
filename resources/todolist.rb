@@ -42,11 +42,15 @@ end
 # on a TodoList object, including iteration and selection.
 
 class TodoList
+  @@cur_id = 0
   attr_accessor :name
+  attr_reader :id
 
   def initialize(name)
     @name = name
     @todos = {}
+    @id = @@cur_id
+    @@cur_id += 1
   end
 
   def <<(todo)
@@ -142,6 +146,11 @@ class TodoList
       todos.values.each_with_index
     end
   end
+
+  def partition
+    todos.values.partition { |todo| yield(todo) }
+  end
+
 
   def select
     res = []

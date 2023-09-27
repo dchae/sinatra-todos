@@ -3,31 +3,31 @@
     <h2><%= @list.name %></h2>
     <ul>
       <li>
-        <form action="/lists/<%=@list_id%>/complete_all" method="post">
+        <form action="/lists/<%=@list.id%>/complete_all" method="post">
           <button class="check" type="submit">Complete All</button>
         </form>
       </li>
       <li>
-        <a class="edit" href="/lists/<%=@list_id%>/edit">Edit List</a>
+        <a class="edit" href="/lists/<%=@list.id%>/edit">Edit List</a>
       </li>
     </ul>
   </header>
   <ul>
-    <% sort_by_done(@list).each do |todo, _| %>
+    <% sort_by_done(@list).each do |todo| %>
       <li class="<%= css_class(todo) %>">
-        <form action="/lists/<%=@list_id%>/todos/<%=todo.id%>" method="post" class="check">
+        <form action="/lists/<%=@list.id%>/todos/<%=todo.id%>" method="post" class="check">
           <input type="hidden" name="completed" value="<%= (!todo.done?).to_s %>">
           <button type="submit">Complete</button>
         </form>
         <h3><%= todo %></h3>
-        <form action="/lists/<%=@list_id%>/todos/<%=todo.id%>/destroy" method="post" class="delete">
+        <form action="/lists/<%=@list.id%>/todos/<%=todo.id%>/destroy" method="post" class="delete">
           <button type="submit">Delete</button>
         </form>
       </li>
     <% end %>
   </ul>
 </section>
-<form action="/lists/<%=@list_id%>/todos" method="post">
+<form action="/lists/<%=@list.id%>/todos" method="post">
   <dl>
     <dt>
       <label for="todo">Enter a new todo item:</label>
